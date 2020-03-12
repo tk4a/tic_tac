@@ -20,7 +20,8 @@ public class TicTac {
     public void start_game(){
         String turn ="X";
         String move = "";
-        display_instruct();pieces();
+        display_instruct();
+        pieces();
         List<String> board = new_board();
         display_board(board);
         while (winner(board).equals("NONE")){
