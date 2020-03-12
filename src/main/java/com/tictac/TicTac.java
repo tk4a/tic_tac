@@ -17,8 +17,40 @@ public class TicTac {
         best_moves.add("4"); best_moves.add("0"); best_moves.add("2"); best_moves.add("6"); best_moves.add("8");
         best_moves.add("1"); best_moves.add("3"); best_moves.add("5"); best_moves.add("7");
     }
+    public void start_game(){
+        String turn ="X";
+        String move = "";
+        display_instruct();pieces();
+        List<String> board = new_board();
+        display_board(board);
+        while (winner(board).equals("NONE")){
+            if (turn.equals(human)){
+                move = human_move(board);
+                while (move.equals("error")) {
+                    move = human_move(board);
+                }
+                board.remove(Integer.parseInt(move));
+                board.add(Integer.parseInt(move),human);
+            }
+            else {
+                move = computer_move(board);
+                System.out.println(move);
+                board.remove(Integer.parseInt(move));
+                board.add(Integer.parseInt(move), computer);
+            }
+            display_board(board);
+            turn = next_turn(turn);
+        }
+        String the_winner = winner(board);
+        congratulation_winner(the_winner);
+        String answer = ask_yes_no("Want to play again?");
+        if(answer.equals("yes"))
+            start_game();
+        else
+            System.out.println("End of the game!");
+    }
 
-    public void display_instruct(){
+    private void display_instruct(){
         System.out.println("Welcome to the Tic Tac game\nTo make a move, enter number from 0 to 8!");
         System.out.println("\n\t0 | 1 | 2 \n\t---------\n\t3 | 4 | 5 \n\t---------\n\t6 | 7 | 8 ");
     }
@@ -28,6 +60,8 @@ public class TicTac {
         String result = scanner.nextLine();
         if (result.equalsIgnoreCase("i"))
             return "i";
+        if (result.equalsIgnoreCase("yes"))
+            return "yes";
         return "n";
     }
     private int ask_number(){
@@ -47,14 +81,14 @@ public class TicTac {
         }
 
     }
-    public List<String> new_board(){
+    private List<String> new_board(){
         board = new ArrayList<>();
         for (int i = 0; i < num_squares; i++) {
             board.add(EMPTY);
         }
         return board;
     }
-    public void display_board(List<String> board){
+    private void display_board(List<String> board){
         System.out.println("\n" + board.get(0) + " | " + board.get(1) + " | " + board.get(2));
         System.out.println("---------");
         System.out.println(board.get(3) + " | " + board.get(4) + " | " + board.get(5));
@@ -69,7 +103,7 @@ public class TicTac {
         }
         return moves;
     }
-    public String winner(List<String> board){
+    private String winner(List<String> board){
         String winner = "NONE";
         int[][] ways_to_win =
                        {{0,1,2},
@@ -89,12 +123,18 @@ public class TicTac {
         return winner;
         }
 
-    public String human_move(List<String> board){
+    private String human_move(List<String> board){
         List<String> legal = legal_moves(board);
         while (legal != null) {
             int move = ask_number();
-            if (!legal.contains(Integer.toString(move)))
-                System.out.println("Field is busy");
+            if (move < 0 || move > 8){
+                System.out.println("Index out of bound\nTry again!");
+                return "error";
+            }
+            if (!legal.contains(Integer.toString(move))) {
+                System.out.println("Field is busy\nTry again!");
+                return "error";
+            }
             return String.valueOf(move);
         }
         return "none";
@@ -118,7 +158,7 @@ public class TicTac {
             return "none";
     }
 
-    public String computer_move(List<String> board){
+    private String computer_move(List<String> board){
 
         String move = move(board, computer);
         if (!move.equals("none"))
@@ -135,13 +175,13 @@ public class TicTac {
         return "none";
     }
 
-    public String next_turn(String turn){
+    private String next_turn(String turn){
         if (turn.equals("X"))
             return "O";
         else
             return "X";
     }
-    public void congratulation_winner(String the_winner){
+    private void congratulation_winner(String the_winner){
         if (!the_winner.equals(TIE))
             System.out.println("Congratulations " + the_winner);
         else
